@@ -13,12 +13,20 @@ export default class App extends Component {
     this.state={
       inventory: [{
         id: "",
+        name: "",
+        price: "",
         image: "",
-        product: "",
-        price: ""
-    }]
-  } }
+        buttonText: "",
+        isEdit: false,
+        currentId: null
+    }],
+      
+  };
+    this.getUpdatedInventory = this.getUpdatedInventory.bind(this);
+    this.currentlySelected = this.currentlySelected.bind(this)
+   }
   componentDidMount(){
+    //read
     axios.get('/api/inventory')
     .then ((response)=>{
       this.setState({
@@ -26,12 +34,35 @@ export default class App extends Component {
       })
     })
   }
+  //pass down to dashboard
+  getUpdatedInventory(){
+    axios.get(`/api/inventory`)
+    .then(response => {
+      this.setState({
+        inventory: response.data
+      })
+  })
+}
+//method to set the selected product on state
+currentlySelected(input){
+  this.setState({
+   currentId: input,
+   name: this.props.name,
+   price: this.props.price,
+   image: this.props.image,
+   isEdit: true
+  })
+}
 
   render() {
     return (
       <div className="App">
-       <Dashboard inventory = {this.state.inventory}/>
-       <Form/>
+       <Dashboard inventory = {this.state.inventory} 
+       getUpdatedInventory={this.getUpdatedInventory}
+       selected={this.currentlySelected}/>
+       <Form inventory = {this.state.inventory} 
+       getUpdatedInventory={this.getUpdatedInventory} 
+       selected={this.currentlySelected}/>
        <Header/>
       </div>
     );
